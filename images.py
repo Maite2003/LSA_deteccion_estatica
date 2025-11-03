@@ -1,5 +1,5 @@
+import cv2
 import mediapipe as mp
-from pathlib import Path
 
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
@@ -66,24 +66,35 @@ def process_images(images):
   options = HandLandmarkerOptions(
       base_options=BaseOptions(model_asset_path=model_path),
       running_mode=VisionRunningMode.IMAGE,
-      num_hands = 1,
+      num_hands = 2,
       min_hand_detection_confidence=0.5
       )
   
   with HandLandmarker.create_from_options(options) as landmarker:
     
-    for image_path in images: 
-      # Load the input image from an image file.
-      mp_image = mp.Image.create_from_file(image_path)
+    for image_path in images:
+      # Read the original image with OpenCV (BGR)
+      bgr = cv2.imread(image_path)
+      if bgr is None:
+        # skip missing files
+        continue
 
-      # SOLUCIÓN 2: Borramos la línea duplicada que causaba el error
-      # mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=mp_image) 
-      
+      # Convert to RGB numpy array for MediaPipe
+      rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+
+      # Create mediapipe Image from numpy array
+      mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+
       # Perform hand landmarks detection on the provided single image.
       hand_landmarker_result = landmarker.detect(mp_image)
-    
-      annotated_image = draw_landmarks_on_image(mp_image, hand_landmarker_result)
-    
-      processed_images.append(annotated_image)
+
+      # Draw landmarks on the RGB image (function expects RGB)
+      annotated_rgb = draw_landmarks_on_image(rgb, hand_landmarker_result)
+
+      # Save a BGR copy for convenience
+      bgr_to_save = cv2.cvtColor(annotated_rgb, cv2.COLOR_RGB2BGR)
+      cv2.imwrite(f'{image_path}_con_Cositas.png', bgr_to_save)
+
+      processed_images.append(annotated_rgb)
       
   return processed_images
