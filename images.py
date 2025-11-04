@@ -70,9 +70,10 @@ def process_images(images):
       min_hand_detection_confidence=0.5
       )
   
+  counter = 0
   with HandLandmarker.create_from_options(options) as landmarker:
-    
     for image_path in images:
+      counter += 1
       # Read the original image with OpenCV (BGR)
       bgr = cv2.imread(image_path)
       if bgr is None:
@@ -92,9 +93,11 @@ def process_images(images):
       annotated_rgb = draw_landmarks_on_image(rgb, hand_landmarker_result)
 
       # Save a BGR copy for convenience
-      bgr_to_save = cv2.cvtColor(annotated_rgb, cv2.COLOR_RGB2BGR)
-      cv2.imwrite(f'{image_path}_con_Cositas.png', bgr_to_save)
+      bgr_to_save = cv2.cvtColor(annotated_rgb, cv2.COLOR_RGB2BGR)  
+      #cv2.imwrite(f'{image_path}_con_Cositas.png', bgr_to_save)
 
-      processed_images.append(annotated_rgb)
+      processed_images.append(bgr_to_save)
+      
+    print(counter)
       
   return processed_images
