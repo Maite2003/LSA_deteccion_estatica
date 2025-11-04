@@ -90,13 +90,13 @@ def process_images(images):
       hand_landmarker_result = landmarker.detect(mp_image)
 
       # Draw landmarks on the RGB image (function expects RGB)
-      annotated_rgb = draw_landmarks_on_image(rgb, hand_landmarker_result)
+      #annotated_rgb = draw_landmarks_on_image(rgb, hand_landmarker_result)
 
       # Save a BGR copy for convenience
-      bgr_to_save = cv2.cvtColor(annotated_rgb, cv2.COLOR_RGB2BGR)  
+      #bgr_to_save = cv2.cvtColor(annotated_rgb, cv2.COLOR_RGB2BGR)  
       #cv2.imwrite(f'{image_path}_con_Cositas.png', bgr_to_save)
 
-      processed_images.append(bgr_to_save)
+      processed_images.append(hand_landmarker_result)
       
     print(counter)
       
